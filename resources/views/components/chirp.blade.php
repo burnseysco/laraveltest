@@ -26,7 +26,7 @@
                 <div class="flex items-center gap-1">
                     <span class="text-sm font-semibold">{{ $chirp->user ? $chirp->user->name : 'Anonymous' }}</span>
                     <span class="text-base-content/60">·</span>
-                    <span class="text-sm text-base-content/60"><a href="mailto:{{ $chirp->user->email }}">{{ $chirp->user->email }}</a></span>
+                    {{-- <span class="text-sm text-base-content/60"><a href="mailto:{{ $chirp->user->email }}">{{ $chirp->user->email }}</a></span> --}}
                 </div>
 
                 <p class="mt-1">
