@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 use App\Models\Chirp;
-
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
+ 
 
 class ChirpController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    use AuthorizesRequests;
     public function index()
     {
         $chirps = Chirp::with("user")->latest()->take(50)->get();  
@@ -37,10 +40,8 @@ class ChirpController extends Controller
                 'message.required' =>'Please write something to chirp!',
                 'message.max' => 'Chirps must be 225 chars or less.',
             ]);
-        Chirp::create([
-        'message' => $validated['message'],
-        'user_id' => null, // We'll add authentication in lesson 11
-        ]);
+        
+        auth()->user()->chirps()->create($validated);
 
         return redirect()->route('home')->with('success','New chirp added');
     }
@@ -56,24 +57,36 @@ class ChirpController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Chirp $chirp)
     {
-        //
+        $this->authorize('update', $chirp);
+        return view('chirps.edit', compact('chirp'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Chirp $chirp)
     {
-        //
+        $this->authorize('update', $chirp);
+
+        $validated = $request->validate([
+            'message'=>'required',]);
+        
+        $chirp->update($validated);
+
+        return redirect('/')->with('success','Chirp updated');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Chirp $chirp)
     {
-        //
+        $this->authorize('delete', $chirp);
+
+        $chirp->delete();
+
+        return redirect()->route('home')->with('success','Deleted Chirp');
     }
 }
